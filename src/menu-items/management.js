@@ -42,7 +42,7 @@ const icons = {
 const management = {
     id: "management",
     title: "Management",
-    type: "collapse",
+    type: "group",
     icon: icons.IconVocabulary,
     children: [
       {

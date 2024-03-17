@@ -47,7 +47,7 @@ const dashboard = {
   children: [
     {
       id: "dashboard",
-      title: "Dashboard",
+      title: "Thống kê",
       type: "item",
       url: "/dashboard",
       icon: icons.IconChartInfographic,
@@ -55,13 +55,14 @@ const dashboard = {
     },
     {
       id: "management",
-      title: "Management",
+      title: "Quản lý",
       type: "collapse",
+      isOpen: true,
       icon: icons.IconVocabulary,
       children: [
         {
           id: "management-student",
-          title: "Student",
+          title: "Sinh viên",
           type: "item",
           url: "/student",
           icon: icons.IconUsers,
@@ -69,7 +70,7 @@ const dashboard = {
         },
         {
           id: "management-lecturer",
-          title: "Lecturer",
+          title: "Giảng viên",
           type: "item",
           url: "/lecturer",
           icon: icons.PiChalkboardTeacher,
@@ -77,7 +78,7 @@ const dashboard = {
         },
         {
           id: "management-curriculum",
-          title: "Curriculum",
+          title: "Chương trình đào tạo",
           url: "/curriculum",
           icon: icons.SlOrganization,
           breadcrumbs: false,
@@ -85,23 +86,31 @@ const dashboard = {
         },
         {
           id: "management-subject-in-quarter",
-          title: "Course Enrollment",
+          title: "Môn theo học kì",
           type: "item",
           url: "/course-enrollment",
           icon: icons.SlGraduation,
+          breadcrumbs: false,
+        },
+        {
+          id: "management-certificate",
+          title: "Chứng chỉ",
+          type: "item",
+          url: "/certificate",
+          icon: icons.SlBadge,
           breadcrumbs: false,
         },
       ],
     },
     {
       id: "component",
-      title: "Component",
+      title: "Thành phần",
       type: "collapse",
       icon: icons.SlFolder,
       children: [
         {
           id: "component-year",
-          title: "Academic Year",
+          title: "Năm học",
           type: "item",
           url: "/year",
           icon: icons.SlCalender,
@@ -109,7 +118,7 @@ const dashboard = {
         },
         {
           id: "component-generation",
-          title: "Generation",
+          title: "Khóa học",
           type: "item",
           url: "/generation",
           icon: icons.SlFolder,
@@ -125,7 +134,7 @@ const dashboard = {
         // },
         {
           id: "component-organization",
-          title: "School/Department",
+          title: "Khoa/Ngành",
           type: "item",
           url: "/organization",
           icon: icons.IconBuildingCommunity,
@@ -133,10 +142,10 @@ const dashboard = {
         },
         {
           id: "component-subject",
-          title: "Subject",
+          title: "Môn học",
           type: "item",
           url: "/subject",
-          icon: icons.SlBook,
+          icon: icons.SlBriefcase,
           breadcrumbs: false,
         },
       ],

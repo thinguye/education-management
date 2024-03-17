@@ -165,9 +165,7 @@ const Year = () => {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value) => (
-          <Typography>{dayjs(value).format("DD/MM/YYYY")}</Typography>
-        ),
+        customBodyRender: (value) => (dayjs(value).format("DD/MM/YYYY")),
       },
     },
     {

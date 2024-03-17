@@ -177,7 +177,7 @@ const Curriculum = () => {
   const columns = [
     {
       name: "code",
-      label: "Curriculum code",
+      label: "Mã CTĐT",
       options: {
         filter: true,
         sort: true,
@@ -185,7 +185,7 @@ const Curriculum = () => {
     },
     {
       name: "organization",
-      label: "Organization",
+      label: "Ngành",
       options: {
         filter: true,
         sort: true,
@@ -196,7 +196,7 @@ const Curriculum = () => {
     },
     {
       name: "generation",
-      label: "Generation",
+      label: "Khóa",
       options: {
         filter: true,
         sort: true,
@@ -211,7 +211,7 @@ const Curriculum = () => {
     },
     {
       name: "credit",
-      label: "Total credit",
+      label: "Tổng tín chỉ",
       options: {
         filter: true,
         sort: true,
@@ -279,7 +279,6 @@ const Curriculum = () => {
     <>
       <div style={{ height: "100%", width: "100%" }}>
         <MUIDataTable
-          title={"Curriculum List"}
           data={data}
           columns={columns}
           options={options}

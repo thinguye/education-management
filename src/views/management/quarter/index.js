@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 
 //MRT Imports
 import MUIDataTable from "mui-datatables";
+import dayjs from "dayjs";
 import {
   DatePicker,
   LocalizationProvider,
@@ -99,6 +100,8 @@ const Quarter = () => {
   const [newQuarter, setNewQuarter] = useState({
     name: "",
     year: {},
+    start: new Date(),
+    end: new Date(),
   });
   const [quarter, setQuarter] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
@@ -154,6 +157,7 @@ const Quarter = () => {
       options: {
         filter: true,
         sort: true,
+        customBodyRender: (value) => dayjs(value).format("DD/MM/YYYY"),
       },
     },
     {
@@ -162,6 +166,7 @@ const Quarter = () => {
       options: {
         filter: true,
         sort: true,
+        customBodyRender: (value) => dayjs(value).format("DD/MM/YYYY"),
       },
     },
     {
@@ -202,9 +207,9 @@ const Quarter = () => {
     console.log(params);
     quarterApi.getQuartersByYear(params).then((res) => {
       setData(res);
-      yearApi.getYearById(params).then((res)=>{
-        setYear(res)
-      })
+      yearApi.getYearById(params).then((res) => {
+        setNewQuarter({ ...newQuarter, year: res });
+      });
     });
   }, []);
 
@@ -244,7 +249,6 @@ const Quarter = () => {
                           setNewQuarter({
                             ...newQuarter,
                             name: e.target.value,
-                            year: year
                           })
                         }
                         required
@@ -254,6 +258,28 @@ const Quarter = () => {
                       </FormLabel>
                     </FormControl>
                   </Grid>
+                </Grid>
+                <Grid container spacing={2}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <Grid item xs={12} sm={4} md={6}>
+                      <DatePicker
+                        value={newQuarter.start}
+                        renderInput={(props) => <TextField {...props} />}
+                        onChange={(newValue) =>
+                          setNewQuarter({ ...newQuarter, start: newValue })
+                        }
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={4} md={6}>
+                      <DatePicker
+                        value={newQuarter.end}
+                        renderInput={(props) => <TextField {...props} />}
+                        onChange={(newValue) =>
+                          setNewQuarter({ ...newQuarter, end: newValue })
+                        }
+                      />
+                    </Grid>
+                  </LocalizationProvider>
                 </Grid>
               </FormGroup>
               <Grid container spacing={1}>

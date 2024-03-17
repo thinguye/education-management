@@ -51,16 +51,22 @@ const ProfileSection = () => {
   const [notification, setNotification] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [open, setOpen] = useState(false);
-  const [tempUser, setTempUser] = useState(sessionStorage.getItem("user"));
+  const tempUser = JSON.parse(sessionStorage.getItem("user"));
+  const roles = tempUser.roles;
+  const role = roles.includes("ROLE_ADMIN")
+    ? "Quản trị viên"
+    : roles.includes("ROLE_STUDENT")
+    ? "Sinh viên"
+    : "Giảng viên";
   /**
    * anchorRef is used on different componets and specifying one type leads to other components throwing an error
    * */
   const anchorRef = useRef(null);
   const handleLogout = async () => {
-    sessionStorage.setItem("token", "");
-    sessionStorage.setItem("user", "");
+    sessionStorage.removeItem("token")
+    sessionStorage.removeItem("user")
+    sessionStorage.removeItem("obj")
     navigate("login");
-    console.log("Logout");
   };
 
   const handleClose = (event) => {
@@ -99,39 +105,39 @@ const ProfileSection = () => {
           alignItems: "center",
           borderRadius: "27px",
           transition: "all .2s ease-in-out",
-          borderColor: theme.palette.primary.light,
-          backgroundColor: theme.palette.primary.light,
+          borderColor: theme.palette.secondary.light,
+          backgroundColor: theme.palette.secondary.light,
           '&[aria-controls="menu-list-grow"], &:hover': {
-            borderColor: theme.palette.primary.main,
-            background: `${theme.palette.primary.main}!important`,
-            color: theme.palette.primary.light,
+            borderColor: theme.palette.secondary.main,
+            background: `${theme.palette.secondary.main}!important`,
+            color: theme.palette.secondary.light,
             "& svg": {
-              stroke: theme.palette.primary.light,
+              stroke: theme.palette.secondary.light,
             },
           },
           "& .MuiChip-label": {
             lineHeight: 0,
           },
         }}
-        icon={
-          <Avatar
-            src={User1}
-            sx={{
-              ...theme.typography.mediumAvatar,
-              margin: "8px 0 8px 8px !important",
-              cursor: "pointer",
-            }}
-            ref={anchorRef}
-            aria-controls={open ? "menu-list-grow" : undefined}
-            aria-haspopup="true"
-            color="inherit"
-          />
-        }
+        // icon={
+        //   <Avatar
+        //     src={User1}
+        //     sx={{
+        //       ...theme.typography.mediumAvatar,
+        //       margin: "8px 0 8px 8px !important",
+        //       cursor: "pointer",
+        //     }}
+        //     ref={anchorRef}
+        //     aria-controls={open ? "menu-list-grow" : undefined}
+        //     aria-haspopup="true"
+        //     color="inherit"
+        //   />
+        // }
         label={
-          <IconSettings
+          <IconUser
             stroke={1.5}
             size="1.5rem"
-            color={theme.palette.primary.main}
+            color={theme.palette.secondary.main}
           />
         }
         variant="outlined"
@@ -139,7 +145,7 @@ const ProfileSection = () => {
         aria-controls={open ? "menu-list-grow" : undefined}
         aria-haspopup="true"
         onClick={handleToggle}
-        color="primary"
+        color="secondary"
       />
       <Popper
         placement="bottom-end"
@@ -172,17 +178,17 @@ const ProfileSection = () => {
                 >
                   <Box sx={{ p: 2 }}>
                     <Stack>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <Typography variant="h4">Good Morning, Thi {tempUser.username}</Typography>
-                        {/* <Typography
+                      <Stack direction="row" alignItems="center">
+                        <Typography
                           component="span"
                           variant="h4"
                           sx={{ fontWeight: 400 }}
-                        ></Typography> */}
+                        >Xin chào, {" "}{tempUser.firstname}{" "}{tempUser.lastname}
+                        </Typography>
                       </Stack>
-                      <Typography variant="subtitle2">Project Admin</Typography>
+                      <Typography variant="subtitle2">{role}</Typography>
                     </Stack>
-                    <OutlinedInput
+                    {/* <OutlinedInput
                       sx={{ width: "100%", pr: 1, pl: 2, my: 2 }}
                       id="input-search-profile"
                       value={value}
@@ -202,77 +208,27 @@ const ProfileSection = () => {
                         "aria-label": "weight",
                       }}
                     />
-                    <Divider />
+                    <Divider /> */}
                   </Box>
-                  <PerfectScrollbar
+                  {/* <PerfectScrollbar
                     style={{
                       height: "100%",
                       maxHeight: "calc(100vh - 250px)",
                       overflowX: "hidden",
                     }}
-                  >
-                    <Box sx={{ p: 2 }}>
-                      <UpgradePlanCard />
-                      <Divider />
-                      <Card
+                  > */}
+                    <Box>
+                      {/* <UpgradePlanCard /> */}
+                      {/* <Divider /> */}
+                      {/* <Card
                         sx={{
                           bgcolor: theme.palette.primary.light,
                           my: 2,
                         }}
                       >
-                        <CardContent>
-                          <Grid container spacing={3} direction="column">
-                            <Grid item>
-                              <Grid
-                                item
-                                container
-                                alignItems="center"
-                                justifyContent="space-between"
-                              >
-                                <Grid item>
-                                  <Typography variant="subtitle1">
-                                    Start DND Mode
-                                  </Typography>
-                                </Grid>
-                                <Grid item>
-                                  <Switch
-                                    color="primary"
-                                    checked={sdm}
-                                    onChange={(e) => setSdm(e.target.checked)}
-                                    name="sdm"
-                                    size="small"
-                                  />
-                                </Grid>
-                              </Grid>
-                            </Grid>
-                            <Grid item>
-                              <Grid
-                                item
-                                container
-                                alignItems="center"
-                                justifyContent="space-between"
-                              >
-                                <Grid item>
-                                  <Typography variant="subtitle1">
-                                    Allow Notifications
-                                  </Typography>
-                                </Grid>
-                                <Grid item>
-                                  <Switch
-                                    checked={notification}
-                                    onChange={(e) =>
-                                      setNotification(e.target.checked)
-                                    }
-                                    name="sdm"
-                                    size="small"
-                                  />
-                                </Grid>
-                              </Grid>
-                            </Grid>
-                          </Grid>
-                        </CardContent>
-                      </Card>
-                      <Divider />
+                        
+                      </Card> */}
+                      {/* <Divider /> */}
                       <List
                         component="nav"
                         sx={{
@@ -284,12 +240,12 @@ const ProfileSection = () => {
                           [theme.breakpoints.down("md")]: {
                             minWidth: "100%",
                           },
-                          "& .MuiListItemButton-root": {
-                            mt: 0.5,
-                          },
+                          // "& .MuiListItemButton-root": {
+                          //   mt: 0.5,
+                          // },
                         }}
                       >
-                        <ListItemButton
+                        {/* <ListItemButton
                           sx={{
                             borderRadius: `${customization.borderRadius}px`,
                           }}
@@ -301,8 +257,8 @@ const ProfileSection = () => {
                               "/user/account-profile/profile1"
                             )
                           }
-                        >
-                          <ListItemIcon>
+                        > */}
+                        {/* <ListItemIcon>
                             <IconSettings stroke={1.5} size="1.3rem" />
                           </ListItemIcon>
                           <ListItemText
@@ -354,7 +310,7 @@ const ProfileSection = () => {
                               </Grid>
                             }
                           />
-                        </ListItemButton>
+                        </ListItemButton> */}
                         <ListItemButton
                           sx={{
                             borderRadius: `${customization.borderRadius}px`,
@@ -367,13 +323,13 @@ const ProfileSection = () => {
                           </ListItemIcon>
                           <ListItemText
                             primary={
-                              <Typography variant="body2">Logout</Typography>
+                              <Typography variant="body2">Đăng xuất</Typography>
                             }
                           />
                         </ListItemButton>
                       </List>
                     </Box>
-                  </PerfectScrollbar>
+                  {/* </PerfectScrollbar> */}
                 </MainCard>
               </ClickAwayListener>
             </Paper>

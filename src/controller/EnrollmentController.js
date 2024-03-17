@@ -40,9 +40,9 @@ export default {
         return res.data.payload;
       }),
   importEnrollment: (request) =>
-    axios.post(IMPORT_ENROLLMENT, request, {
-      headers: { "Content-Type": "multipart/form-data", Accept: "*/*" },
-    }),
+    axios.post(IMPORT_ENROLLMENT, request, { headers: Headers.getHeaders3() }).then((res) => {return res}),
   updateGradeFile: (request) =>
-    axios.post(UPDATE_GRADE_FILE, request, { headers: Headers.getHeaders3() }),
+    axios
+      .post(UPDATE_GRADE_FILE, request, { headers: Headers.getHeaders3() })
+      .then((res) => {return res}),
 };

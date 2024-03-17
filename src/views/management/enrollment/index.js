@@ -19,6 +19,7 @@ import {
   CloudUpload,
   Send,
   Grading,
+  UploadFileSharp,
 } from "@mui/icons-material";
 //Material-UI Imports
 //Icons Imports
@@ -49,23 +50,29 @@ import {
 } from "@mui/material";
 import { render } from "@testing-library/react";
 import { useParams } from "react-router-dom";
+import AlertDialog from "ui-component/AlertDialog";
 const Enrollment = () => {
   const HeaderElements = () => (
     <>
-      <IconButton
-        onMouseEnter={() => setFocus1(true)}
-        onMouseLeave={() => setFocus1(false)}
-        onClick={(e) => handleShowUpload()}
-      >
-        <UploadFile color={focus1 ? "primary" : "default"} />
-      </IconButton>
-      <IconButton
-        onMouseEnter={() => setFocus2(true)}
-        onMouseLeave={() => setFocus2(false)}
-        onClick={(e) => handleShowAdd()}
-      >
-        <Add color={focus2 ? "primary" : "default"} />
-      </IconButton>
+      <Tooltip title="Add New">
+        <IconButton
+          onMouseEnter={() => setFocus2(true)}
+          onMouseLeave={() => setFocus2(false)}
+          onClick={(e) => handleShowAdd()}
+        >
+          <Add color={focus2 ? "primary" : "default"} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Import Enrollment">
+        <IconButton
+          onMouseEnter={() => setFocus1(true)}
+          onMouseLeave={() => setFocus1(false)}
+          onClick={(e) => handleShowUpload()}
+        >
+          <UploadFileSharp color={focus1 ? "primary" : "default"} />
+        </IconButton>
+      </Tooltip>
+
       <Tooltip title="Upload File">
         <IconButton
           onMouseEnter={() => setFocus3(true)}
@@ -113,6 +120,7 @@ const Enrollment = () => {
       marginBottom: 10,
     },
   };
+  const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
   const [data, setData] = useState([]);
   const [focus1, setFocus1] = useState(false);
@@ -122,12 +130,16 @@ const Enrollment = () => {
     student: "",
     subject: id,
   });
+
   const [gradeFile, setGradeFile] = useState({
     subject: id,
     file: null,
   });
   const [student, setStudent] = useState(null);
-  const [tempFile, setTempFile] = useState(null);
+  const [tempFile, setTempFile] = useState({
+    id: id,
+    file: null,
+  });
   const [enrollment, setEnrollment] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const handleShowAdd = () => {
@@ -150,8 +162,11 @@ const Enrollment = () => {
   };
   const handleUploadFile = () => {
     console.log(gradeFile);
-    enrollmentApi.updateGradeFile(gradeFile);
-    setShowUploadFile(false);
+    enrollmentApi.updateGradeFile(gradeFile).then((res) => {
+      setShowUploadFile(false);
+      handleShowAlert()
+    });
+    
   };
   const [showDelete, setShowDelete] = useState(false);
   const handleShowDelete = (value) => {
@@ -167,22 +182,18 @@ const Enrollment = () => {
     handleCloseDelete();
   };
   const [showUpload, setShowUpload] = useState(false);
-  const handleShowUpload = (value) => {
-    setEnrollment(value);
+  const handleShowUpload = () => {
     setShowUpload(true);
   };
   const handleCloseUpload = () => {
     setShowUpload(false);
-    setEnrollment(null);
   };
   const handleUpload = () => {
-    const ele = {
-      id: id,
-      file: tempFile[0],
-    };
-    console.log(ele);
-    enrollmentApi.importEnrollment(ele);
-    handleCloseUpload();
+    enrollmentApi.importEnrollment(tempFile).then((res) => {
+      handleCloseUpload();
+      handleShowAlert()
+    });
+    
   };
   const [showUpdate, setShowUpdate] = useState(false);
   const handleShowUpdate = (value) => {
@@ -193,6 +204,7 @@ const Enrollment = () => {
     setShowUpdate(false);
     setStudent(null);
   };
+  const [showAlert,setShowAlert] = useState(false);
   const handleUpdate = () => {
     const ele = {
       id: student.id,
@@ -200,12 +212,11 @@ const Enrollment = () => {
     };
     console.log(ele);
     enrollmentApi.updateEnrollment(ele);
-    handleCloseUpdate();
   };
   const columns = [
     {
       name: "student",
-      label: "Student name",
+      label: "Họ và tên",
       options: {
         filter: true,
         sort: true,
@@ -218,7 +229,7 @@ const Enrollment = () => {
     },
     {
       name: "student",
-      label: "IRN",
+      label: "Mã số",
       options: {
         filter: true,
         sort: true,
@@ -227,7 +238,7 @@ const Enrollment = () => {
     },
     {
       name: "gradeLetter",
-      label: "Grade",
+      label: "Xếp loại",
       options: {
         filter: true,
         sort: true,
@@ -245,8 +256,8 @@ const Enrollment = () => {
       },
     },
     {
-      name: "action",
-      label: "Action",
+      name: "",
+      label: "",
       options: {
         filter: true,
         sort: false,
@@ -254,7 +265,6 @@ const Enrollment = () => {
         customBodyRenderLite: (dataIndex, rowIndex) => {
           return (
             <>
-              
               <IconButton
                 color="primary"
                 onClick={(e) => handleShowUpdate(data[dataIndex])}
@@ -275,26 +285,34 @@ const Enrollment = () => {
   ];
 
   const options = {
-    filterType: "checkbox",
+    textLabels: {
+      body: {
+        noMatch: isLoading ? "Không có dữ liệu" : "Đang tải dữ liệu...",
+      },
+    },
+    filterType: "dropdown",
+    selectableRows: "none",
     customToolbar: () => <HeaderElements />,
   };
-
+const handleCloseAlert=()=>{
+  setShowAlert(false)
+}
+const handleShowAlert=()=>{
+  setShowAlert(true)
+}
   useEffect(() => {
     enrollmentApi.getEnrollmentSubject(id).then((res) => {
-      console.log(res);
       setData(res);
+      setIsLoading(true);
     });
   }, []);
 
   return (
     <>
       <div style={{ height: "100%", width: "100%" }}>
-        <MUIDataTable
-          title={"Enrollment List"}
-          data={data}
-          columns={columns}
-          options={options}
-        />
+        <MUIDataTable data={data} columns={columns} options={options} />
+
+        {/* Add New */}
         <Modal
           aria-labelledby="transition-modal-title"
           aria-describedby="transition-modal-description"
@@ -358,6 +376,7 @@ const Enrollment = () => {
             </Box>
           </Fade>
         </Modal>
+        {/* Delete */}
         <Modal
           aria-labelledby="transition-modal-title"
           aria-describedby="transition-modal-description"
@@ -414,69 +433,7 @@ const Enrollment = () => {
             </Box>
           </Fade>
         </Modal>
-        <Modal
-          aria-labelledby="transition-modal-title"
-          aria-describedby="transition-modal-description"
-          open={showAdd}
-          onClose={handleCloseAdd}
-          closeAfterTransition
-          slots={{ backdrop: Backdrop }}
-          slotProps={{
-            backdrop: {
-              timeout: 500,
-            },
-          }}
-        >
-          <Fade in={showAdd}>
-            <Box sx={style.boxStyle}>
-              <Typography style={style.textStyle}>
-                Add New Enrollment
-              </Typography>
-              <FormGroup>
-                <FormControl>
-                  <Input
-                    id="code"
-                    aria-describedby="code"
-                    onChange={(e) =>
-                      setNewEnrollment({
-                        ...newEnrollment,
-                        student: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                  <FormLabel id="code" style={style.formStyle}>
-                    Student IRN
-                  </FormLabel>
-                </FormControl>
-              </FormGroup>
-              <Grid container spacing={1}>
-                <Grid item xs={6}>
-                  <div style={{ textAlign: "right" }}>
-                    <Button
-                      color="primary"
-                      startIcon={<Save />}
-                      onClick={handleAdd}
-                    >
-                      Save
-                    </Button>
-                  </div>
-                </Grid>
-                <Grid item xs={6}>
-                  <div style={{ textAlign: "left" }}>
-                    <Button
-                      color="error"
-                      startIcon={<Cancel />}
-                      onClick={handleCloseAdd}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </Grid>
-              </Grid>
-            </Box>
-          </Fade>
-        </Modal>
+        {/* Update */}
         <Modal
           aria-labelledby="transition-modal-title"
           aria-describedby="transition-modal-description"
@@ -539,6 +496,7 @@ const Enrollment = () => {
             </Box>
           </Fade>
         </Modal>
+        {/* Upload Grade */}
         <Modal
           aria-labelledby="transition-modal-title"
           aria-describedby="transition-modal-description"
@@ -593,6 +551,67 @@ const Enrollment = () => {
             </Box>
           </Fade>
         </Modal>
+
+        {/* Import list of enrollment */}
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          open={showUpload}
+          onClose={handleCloseUpload}
+          closeAfterTransition
+          slots={{ backdrop: Backdrop }}
+          slotProps={{
+            backdrop: {
+              timeout: 500,
+            },
+          }}
+        >
+          <Fade in={showUpload}>
+            <Box sx={style.boxStyle}>
+              <Typography style={style.textStyle}>
+                Import enrollments
+              </Typography>
+              <FormGroup>
+                <TextField
+                  type="file"
+                  onChange={(e) =>
+                    setTempFile({
+                      ...tempFile,
+                      file: e.target.files[0],
+                    })
+                  }
+                ></TextField>
+              </FormGroup>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <div style={{ textAlign: "right" }}>
+                    <Button
+                      color="primary"
+                      startIcon={<Send />}
+                      onClick={handleUpload}
+                    >
+                      Submit
+                    </Button>
+                  </div>
+                </Grid>
+                <Grid item xs={6}>
+                  <div style={{ textAlign: "left" }}>
+                    <Button
+                      color="error"
+                      startIcon={<Cancel />}
+                      onClick={handleCloseUpload}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </Grid>
+              </Grid>
+            </Box>
+          </Fade>
+        </Modal>
+
+        {/* Alert */}
+        <AlertDialog type={"success"} title={"Thành công"} message={"Cập nhật điểm thành công"} showAlert={showAlert} handleClose={handleCloseAlert}/>
       </div>
     </>
   );

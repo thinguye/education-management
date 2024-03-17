@@ -15,37 +15,32 @@ import AuthLogin from "../../pages/authentication/auth-forms/AuthLogin";
 import useToken from "useToken";
 // ==============================|| DEFAULT DASHBOARD ||============================== //
 import studentApi from "controller/StudentController";
+import generationApi from "controller/GenerationController";
+import departmentApi from "controller/DepartmentController";
 import { BarChart, PieChart } from "@mui/icons-material";
 import GraduationStatistics from "./GraduationStatistics";
 import RadialBarGraduation from "./RadialBarGraduation";
 const Dashboard = () => {
   var token = sessionStorage.getItem("token");
-  const [students, setStudents] = useState([]);
   const [isLoading, setLoading] = useState(true);
-
-  const [undergraduated, setUndergraduated] = useState(0);
-  const [graduated, setGraduated] = useState(0);
-  const [leaved, setLeaved] = useState(0);
-  const [ielts, setIelts] = useState(0);
-  const [qp, setQp] = useState(0);
-  const [credit, setCredit] = useState(0);
-  const [ieltsButDone, setIeltsButDone] = useState(0);
-  const [qpButDone, setQpButDone] = useState(0);
-  const [waiting, setWaiting] = useState(0);
+  const [departments, setDepartments] = useState([]);
+  const statusList = [
+    { value: null, name: "Tất cả" },
+    { value: "INCOMPLETE", name: "Đang theo học" },
+    { value: "COMPLETED", name: "Đã hoàn thành chương trình" },
+    { value: "LEAVED", name: "Bỏ học" },
+  ];
+  const [generations, setGenerations] = useState([]);
   useEffect(() => {
-    // studentApi.getAllStudents().then((result) => {
-    //   setStudents(result);
-    // });
-    studentApi.getUndergraduateStudent().then((res) => {
-      setIelts(res.ielts);
-      setQp(res.qp);
-      setCredit(res.credit);
-      setUndergraduated(res.undergraduate);
-      setGraduated(res.graduated);
-      setIeltsButDone(res.ieltsButDone);
-      setQpButDone(res.qpButDone);
-      setLeaved(res.leaved);
-      setWaiting(res.waiting);
+    generationApi.getAllGenerations().then((res) => {
+      var ele = { id: null, name: "Tất cả" };
+      res.unshift(ele);
+      setGenerations(res);
+      departmentApi.getAllDepartments().then((result) => {
+        var temp = { id: null, name: "Tất cả" };
+        result.unshift(temp);
+        setDepartments(result);
+      });
     });
     setTimeout(() => {
       setLoading(false);
@@ -83,7 +78,7 @@ const Dashboard = () => {
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item xs={12} md={6} sm={6} lg={6}>
-            <TotalGrowthBarChart isLoading={isLoading} />
+            <TotalGrowthBarChart isLoading={isLoading} generations={generations} />
           </Grid>
           {/* <Grid item xs={12} md={4}>
                         <PopularCard isLoading={isLoading} />
@@ -91,8 +86,9 @@ const Dashboard = () => {
           <Grid item xs={12} md={6} sm={6} lg={6}>
             <GraduationStatistics
               isLoading={isLoading}
-              data={[undergraduated, waiting, graduated, leaved]}
-              category={["Incomplete", "Completed", "Graduated", "Leaved"]}
+              category={["Đang theo học", "Đã hoàn thành", "Đã tốt nghiệp", "Bỏ học"]}
+              generations={generations}
+              departments={departments}
             />
           </Grid>
         </Grid>
@@ -102,9 +98,11 @@ const Dashboard = () => {
           <Grid item xs={12} md={6} sm={12} lg={6}>
             <RadialBarGraduation
               isLoading={isLoading}
-              data={[ielts, qp, undergraduated]}
-              category={["IELTS 6.0", "Milirity", "Incomplete"]}
-              title="Causes of undergraduating"
+              category={["IELTS 6.0", "Quốc phòng", "Chưa đủ tín chỉ"]}
+              title="Chưa đủ điều kiện tốt nghiệp"
+              generations={generations}
+              departments={departments}
+              statusList={statusList}
             />
           </Grid>
         </Grid>

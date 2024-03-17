@@ -13,6 +13,7 @@ import Enrollment from 'views/management/enrollment';
 import Elective from 'views/management/subject/Elective';
 import AuthLogin3 from "views/pages/authentication/authentication3/Login3";
 import StudentResult from 'views/management/student/StudentResult';
+import Certificate from 'views/management/certificate';
 
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -208,6 +209,15 @@ const MainRoutes = {
                 {
                     path: "id",
                     element: <Elective />
+                }
+            ]
+        },
+        {
+            path: 'certificate',
+            children: [
+                {
+                    path:'',
+                    element: <Certificate />
                 }
             ]
         },

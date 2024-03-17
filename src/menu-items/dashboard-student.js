@@ -6,6 +6,7 @@ import {
     SlOrganization,
     SlCalender,
     SlFolder,
+    SlInfo,
   } from "react-icons/sl";
   import { GiArchiveRegister } from "react-icons/gi";
   import {
@@ -31,121 +32,66 @@ import {
     IconBuildingCommunity,
     SlFolder,
     GiArchiveRegister,
+    SlInfo
   };
   
   // ==============================|| DASHBOARD MENU ITEMS ||============================== //
   
-  const dashboard = {
+  const dashboardStudent = {
     id: "dashboard",
     title: "Dashboard",
     type: "group",
     children: [
       {
         id: "dashboard",
-        title: "Dashboard",
+        title: "Thống kê",
         type: "item",
         url: "/dashboard",
         icon: icons.IconChartInfographic,
         breadcrumbs: false,
       },
       {
-        id: "achivement",
-        title: "Achivement",
+        id: "infor",
+        title: "Thông tin",
         type: "item",
-        url: "/achivement",
-        icon: icons.SlBadge,
+        url: "/infor",
+        icon: icons.SlInfo,
         breadcrumbs: false,
       },
       {
-        id: "management",
-        title: "Management",
-        type: "collapse",
-        icon: icons.IconVocabulary,
-        children: [
-          {
-            id: "management-student",
-            title: "Student",
-            type: "item",
-            url: "/student",
-            icon: icons.IconUsers,
-            breadcrumbs: false,
-          },
-          {
-            id: "management-lecturer",
-            title: "Lecturer",
-            type: "item",
-            url: "/lecturer",
-            icon: icons.SlGraduation,
-            breadcrumbs: false,
-          },
-          {
-            id: "management-curriculum",
-            title: "Curriculum",
-            url: "/curriculum",
-            icon: icons.SlOrganization,
-            breadcrumbs: false,
-            type: "item",
-          },
-          {
-            id: "management-subject-in-quarter",
-            title: "Course Enrollment",
-            type: "item",
-            url: "/course-enrollment",
-            icon: icons.SlGraduation,
-            breadcrumbs: false,
-          },
-        ],
+        id: "curriculum",
+        title: "Chương trình đào tạo",
+        type: "item",
+        url: "/curriculum",
+        icon: icons.SlOrganization,
+        breadcrumbs: false,
       },
       {
-        id: "component",
-        title: "Component",
-        type: "collapse",
-        icon: icons.SlFolder,
-        children: [
-          {
-            id: "component-year",
-            title: "Year",
-            type: "item",
-            url: "/year",
-            icon: icons.SlCalender,
-            breadcrumbs: false,
-          },
-          {
-            id: "component-generation",
-            title: "Generation",
-            type: "item",
-            url: "/generation",
-            icon: icons.SlCalender,
-            breadcrumbs: false,
-          },
-          {
-            id: "component-quarter",
-            title: "Quarter",
-            type: "item",
-            url: "/quarter",
-            icon: icons.SlCalender,
-            breadcrumbs: false,
-          },
-          {
-            id: "component-organization",
-            title: "Organization",
-            type: "item",
-            url: "/organization",
-            icon: icons.IconBuildingCommunity,
-            breadcrumbs: false,
-          },
-          {
-            id: "component-subject",
-            title: "Subject",
-            type: "item",
-            url: "/subject",
-            icon: icons.SlBriefcase,
-            breadcrumbs: false,
-          },
-        ],
+        id:"result",
+        title:"Kết quả học tập",
+        type:"item",
+        url: "/result",
+        icon: icons.SlGraduation,
+        breadcrumbs: false,
       },
+      {
+        id:"incomplete-subjects",
+        title:"Các môn chưa học",
+        type:"item",
+        url: "/incomplete-subjects",
+        icon: icons.SlGraduation,
+        breadcrumbs: false,
+      },
+      {
+        id:"roadmap",
+        title:"Lộ trình học",
+        type:"item",
+        url: "/roadmap",
+        icon: icons.SlGraduation,
+        breadcrumbs: false,
+      }
     ],
   };
   
-  export default dashboard;
+  export default dashboardStudent;
   

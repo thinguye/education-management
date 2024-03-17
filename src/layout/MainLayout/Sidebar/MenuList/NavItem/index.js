@@ -56,12 +56,6 @@ const NavItem = ({ item, level }) => {
         {...props}
         to={item.url}
         target={itemTarget}
-        onClick={(e) => {
-          if (item.id === "signout") {
-            sessionStorage.setItem("token", "");
-            window.location.reload()
-          }
-        }}
       />
     )),
   };

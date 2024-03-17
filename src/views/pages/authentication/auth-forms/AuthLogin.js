@@ -36,6 +36,8 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import Google from "assets/images/icons/social-google.svg";
 
 import authApi from "../../../../controller/AuthController";
+import studentApi from "controller/StudentController";
+import lecturerApi from "controller/LecturerController";
 // ============================|| FIREBASE - LOGIN ||============================ //
 
 const FirebaseLogin = ({ ...others }) => {
@@ -64,7 +66,7 @@ const FirebaseLogin = ({ ...others }) => {
   return (
     <>
       <Grid container direction="column" justifyContent="center" spacing={2}>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <AnimateButton>
             <Button
               disableElevation
@@ -120,7 +122,7 @@ const FirebaseLogin = ({ ...others }) => {
 
             <Divider sx={{ flexGrow: 1 }} orientation="horizontal" />
           </Box>
-        </Grid>
+        </Grid> */}
         <Grid
           item
           xs={12}
@@ -128,9 +130,9 @@ const FirebaseLogin = ({ ...others }) => {
           alignItems="center"
           justifyContent="center"
         >
-          <Box sx={{ mb: 1 }}>
-            <Typography variant="subtitle1">
-              Sign in with Email address
+          <Box sx={{ mb: 2, mt: 2 }}>
+            <Typography variant="h4" color={theme.palette.secondary.dark}>
+              Đăng nhập bằng địa chỉ email
             </Typography>
           </Box>
         </Grid>
@@ -143,13 +145,9 @@ const FirebaseLogin = ({ ...others }) => {
           submit: null,
         }}
         validationSchema={Yup.object().shape({
-          email: Yup.string().max(255).required("Email is required"),
+          email: Yup.string().max(255).required("Email/username is required"),
           password: Yup.string()
             .min(8, "Password must be at least 8 characters.")
-            .matches(
-              /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/,
-              "Password must contain at least 8 characters, one uppercase, one number and one special case character"
-            )
             .max(255)
             .required("Password is required"),
         })}
@@ -167,7 +165,16 @@ const FirebaseLogin = ({ ...others }) => {
             var res = await authApi.signIn(request);
             sessionStorage.setItem("user", JSON.stringify(res));
             sessionStorage.setItem("token", "Bearer " + res.accessToken);
-            window.location.replace("/")
+            if (!res.roles.includes("ROLE_ADMIN")) {
+              if (res.roles.includes("ROLE_STUDENT")) {
+                var st = await studentApi.getStudentByEmail(res.email);
+                sessionStorage.setItem("obj", JSON.stringify(st));
+              } else if (res.roles.includes("ROLE_LECTURER")) {
+                var lec = await lecturerApi.getLecturerByEmail(res.email);
+                sessionStorage.setItem("obj", JSON.stringify(lec));
+              }
+            }
+            window.location.replace("/");
           } catch (err) {
             console.error(err);
             if (scriptedRef.current) {
@@ -194,7 +201,7 @@ const FirebaseLogin = ({ ...others }) => {
               sx={{ ...theme.typography.customInput }}
             >
               <InputLabel htmlFor="outlined-adornment-email-login">
-                Email Address/Username
+                Địa chỉ email hoặc tên tài khoản
               </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-email-login"
@@ -204,7 +211,7 @@ const FirebaseLogin = ({ ...others }) => {
                 onBlur={handleBlur}
                 onChange={handleChange}
                 size="small"
-                label="Email Address/Username"
+                label="Địa chỉ email hoặc tên tài khoản"
                 inputProps={{}}
               />
               {touched.email && errors.email && (
@@ -223,7 +230,7 @@ const FirebaseLogin = ({ ...others }) => {
               sx={{ ...theme.typography.customInput }}
             >
               <InputLabel htmlFor="outlined-adornment-password-login">
-                Password
+                Mật khẩu
               </InputLabel>
               <OutlinedInput
                 id="outlined-adornment-password-login"
@@ -245,7 +252,7 @@ const FirebaseLogin = ({ ...others }) => {
                     </IconButton>
                   </InputAdornment>
                 }
-                label="Password"
+                label="Mật khẩu"
                 inputProps={{}}
               />
               {touched.password && errors.password && (
@@ -274,13 +281,13 @@ const FirebaseLogin = ({ ...others }) => {
                 }
                 label="Remember me"
               /> */}
-              <Typography
+              {/* <Typography
                 variant="subtitle1"
                 color="secondary"
                 sx={{ textDecoration: "none", cursor: "pointer" }}
               >
                 Forgot Password?
-              </Typography>
+              </Typography> */}
             </Stack>
             {errors.submit && (
               <Box sx={{ mt: 3 }}>
@@ -299,7 +306,7 @@ const FirebaseLogin = ({ ...others }) => {
                   variant="contained"
                   color="secondary"
                 >
-                  Sign in
+                  Đăng nhập
                 </Button>
               </AnimateButton>
             </Box>

@@ -1,5 +1,6 @@
+import { useEffect } from "react";
+import studentApi from "controller/StudentController"
 // ===========================|| DASHBOARD - TOTAL GROWTH BAR CHART ||=========================== //
-
 const chartData = {
     height: 400,
     type: 'bar',
@@ -65,23 +66,6 @@ const chartData = {
             show: true
         }
     },
-    series: [
-        {
-            name: 'Business',
-            data: [300, 445, 412, 395, 456, 550]
-        },
-        {
-            name: 'CIT',
-            data: [50, 74, 105, 125, 150, 202]
-        },
-        {
-            name: 'Engineering',
-            data: [32, 35, 35, 45, 50, 70]
-        },
-        {
-            name: 'Nursing',
-            data: [32, 35, 45, 39, 45, 60]
-        }
-    ]
+    
 };
 export default chartData;

@@ -145,7 +145,19 @@ const Generation = () => {
       label: "Generation",
       options: {
         filter: true,
-        sort:false
+        sort: true,
+        sortCompare: (order) => {
+          return (obj1, obj2) => {
+            console.log(obj1, obj2);
+            let val1 = parseInt(
+              obj1.data.substring(obj1.data.indexOf(" ") + 1)
+            );
+            let val2 = parseInt(
+              obj2.data.substring(obj2.data.indexOf(" ") + 1)
+            );
+            return (val1 - val2) * (order === "asc" ? 1 : -1);
+          };
+        },
       },
     },
     {
@@ -153,17 +165,16 @@ const Generation = () => {
       label: "Year enroll",
       options: {
         filter: true,
-        sort:false,
+        sort: false,
         customBodyRender: (value) => {
           return value.name;
         },
       },
     },
     {
-      name: "action",
-      label: "Action",
+      name: "",
       options: {
-        filter:false,
+        filter: false,
         sort: false,
         empty: true,
         customBodyRenderLite: (dataIndex, rowIndex) => {

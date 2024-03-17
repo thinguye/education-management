@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 // material-ui
 import { useTheme } from "@mui/material/styles";
 import {
+  Autocomplete,
   Button,
   Grid,
   Icon,
@@ -40,11 +41,19 @@ const status = [
     label: "This Year",
   },
 ];
-const RadialBarGraduation = ({ isLoading, data, category, title }) => {
-  const [value, setValue] = useState("today");
+const RadialBarGraduation = ({
+  isLoading,
+  category,
+  title,
+  generations,
+  departments,
+  statusList,
+}) => {
   const theme = useTheme();
   const customization = useSelector((state) => state.customization);
-
+  const [generation, setGeneration] = useState(generations[0]);
+  const [department, setDepartment] = useState(departments[0]);
+  const [status, setStatus] = useState(statusList[0]);
   const { navType } = customization;
   const { primary } = theme.palette.text;
   const darkLight = theme.palette.dark.light;
@@ -58,16 +67,6 @@ const RadialBarGraduation = ({ isLoading, data, category, title }) => {
   const secondaryMain = theme.palette.secondary.main;
   const secondaryLight = theme.palette.secondary.light;
   const secondary200 = theme.palette.secondary[200];
-
-  const [undergraduated, setUndergraduated] = useState(0);
-  const [graduated, setGraduated] = useState(0);
-  const [leaved, setLeaved] = useState(0);
-  const [ielts, setIelts] = useState(0);
-  const [qp, setQp] = useState(0);
-  const [credit, setCredit] = useState(0);
-  const [ieltsButDone, setIeltsButDone] = useState(0);
-  const [qpButDone, setQpButDone] = useState(0);
-  const [waiting, setWaiting] = useState(0);
 
   //   useEffect(() => {
   //     const newChartData = {
@@ -129,23 +128,51 @@ const RadialBarGraduation = ({ isLoading, data, category, title }) => {
   //     isLoading,
   //     grey500,
   //   ]);
+  const [data, setData] = useState([]);
   useEffect(() => {
-    studentApi.getUndergraduateStudent().then((res) => {
-      setIelts(res.ielts);
-      setQp(res.qp);
-      setCredit(res.credit);
-      setUndergraduated(res.undergraduate);
-      setGraduated(res.graduated);
-      setIeltsButDone(res.ieltsButDone);
-      setQpButDone(res.qpButDone);
-      setLeaved(res.leaved);
-      setWaiting(res.waiting);
+    studentApi.getCertificateByFilter("", "", "").then((res) => {
+      setData(res);
     });
     // do not load chart when loading
     if (!isLoading) {
       ApexCharts.exec(`pie`, "updateOptions");
     }
   }, []);
+
+  const handleChange = (newValue) => {
+    studentApi
+      .getCertificateByFilter(
+        newValue == null ? "" : newValue,
+        department == null ? "" : department.id == null ? "" : department.id,
+        status.value == null ? "" : status.value
+      )
+      .then((res) => {
+        setData(res);
+      });
+  };
+
+  const handleChange1 = (newValue) => {
+    studentApi
+      .getCertificateByFilter(
+        generation == null ? "" : generation.id == null ? "" : generation.id,
+        newValue == null ? "" : newValue,
+        status.value == null ? "" : status.value
+      )
+      .then((res) => {
+        setData(res);
+      });
+  };
+  const handleChange2 = (newValue) => {
+    studentApi
+      .getCertificateByFilter(
+        generation == null ? "" : generation.id == null ? "" : generation.id,
+        department == null ? "" : department.id == null ? "" : department.id,
+        newValue == null ? "" : newValue
+      )
+      .then((res) => {
+        setData(res);
+      });
+  };
   const radialBarChartConfig = {
     chart: {
       height: 380,
@@ -204,8 +231,36 @@ const RadialBarGraduation = ({ isLoading, data, category, title }) => {
 
   const options = {
     chart: {
-      height: 400,
+      height: 500,
       type: "radialBar",
+    },
+    tooltip: {
+      theme: "light",
+      enabled: true,
+      enabledOnSeries: undefined,
+      shared: true,
+      followCursor: false,
+      intersect: false,
+      inverseOrder: false,
+      custom: undefined,
+      hideEmptySeries: true,
+      fillSeriesColor: false,
+      style: {
+        fontSize: "12px",
+        fontFamily: undefined,
+      },
+      onDatasetHover: {
+        highlightDataSeries: false,
+      },
+      items: {
+        display: "flex",
+      },
+      fixed: {
+        enabled: false,
+        position: "topRight",
+        offsetX: 0,
+        offsetY: 0,
+      },
     },
     plotOptions: {
       radialBar: {
@@ -235,20 +290,17 @@ const RadialBarGraduation = ({ isLoading, data, category, title }) => {
     labels: category,
     legend: {
       show: true,
-      floating: true,
-      fontSize: "16px",
-      position: "left",
-      offsetX: 50,
-      offsetY: 25,
+      fontSize: "14px",
+      fontFamily: `'Roboto', sans-serif`,
+      position: "right",
       labels: {
         colors: grey500,
-        useSeriesColors: true,
+        useSeriesColors: false,
       },
       markers: {
-        size: 0,
-      },
-      formatter: function (seriesName, opts) {
-        return seriesName + ":  " + opts.w.globals.series[opts.seriesIndex];
+        width: 16,
+        height: 16,
+        radius: 5,
       },
       itemMargin: {
         vertical: 3,
@@ -287,6 +339,44 @@ const RadialBarGraduation = ({ isLoading, data, category, title }) => {
                   </Grid>
                 </Grid>
               </Grid>
+            </Grid>
+            <Grid item xs={12} sm={4} alignItems="right">
+              <Autocomplete
+                value={generation}
+                options={generations}
+                onChange={(event, newValue) => {
+                  setGeneration(newValue);
+                  handleChange(newValue.id);
+                }}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => <TextField {...params} label="Khóa" />}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4} alignItems="right">
+              <Autocomplete
+                value={department}
+                options={departments}
+                onChange={(event, newValue) => {
+                  setDepartment(newValue);
+                  handleChange1(newValue.id);
+                }}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => <TextField {...params} label="Khoa" />}
+              />
+            </Grid>
+            <Grid item xs={12} sm={4} alignItems="right">
+              <Autocomplete
+                value={status}
+                options={statusList}
+                onChange={(event, newValue) => {
+                  setStatus(newValue);
+                  handleChange2(newValue.value);
+                }}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField {...params} label="Trạng thái" />
+                )}
+              />
             </Grid>
             <Grid item xs={12} alignItems="center">
               <Chart options={options} series={data} type="radialBar" />

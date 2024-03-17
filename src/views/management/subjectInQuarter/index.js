@@ -21,6 +21,7 @@ import {
   Send,
   Assessment,
   FindInPage,
+  UploadFileSharp,
 } from "@mui/icons-material";
 //Material-UI Imports
 //Icons Imports
@@ -71,6 +72,15 @@ const SubjectInQuarter = () => {
           onClick={(e) => handleShowAdd()}
         >
           <Add color={focus ? "primary" : "default"} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Import Subjects">
+        <IconButton
+          onMouseEnter={() => setFocus1(true)}
+          onMouseLeave={() => setFocus1(false)}
+          onClick={(e) => handleShowUpload()}
+        >
+          <UploadFileSharp color={focus1 ? "primary" : "default"} />
         </IconButton>
       </Tooltip>
     </>
@@ -139,15 +149,18 @@ const SubjectInQuarter = () => {
     },
   };
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [quarters, setQuarters] = useState([]);
   const [lecturers, setLecturers] = useState([]);
   const [focus, setFocus] = useState(false);
+  const [focus1, setFocus1] = useState(false);
   const [gradeFile, setGradeFile] = useState({
     subject: "",
     file: null,
   });
+  const [file, setFile] = useState(null);
   const [newSubjectInQuarter, setNewSubjectInQuarter] = useState({
     quarter: {},
     subject: {},
@@ -197,14 +210,14 @@ const SubjectInQuarter = () => {
   const handleShowUploadFile = (value) => {
     setGradeFile({
       ...gradeFile,
-      id: value,
+      subject: value,
     });
     setShowUploadFile(true);
   };
   const handleCloseUploadFile = () => {
     setShowUploadFile(false);
     setGradeFile({
-      id: "",
+      subject: "",
       file: null,
     });
   };
@@ -213,6 +226,19 @@ const SubjectInQuarter = () => {
     enrollmentApi.updateGradeFile(gradeFile);
     setShowUploadFile(false);
   };
+  const [showUpload, setShowUpload] = useState(false);
+  const handleShowUpload = () => {
+    setShowUpload(true);
+  };
+  const handleCloseUpload = () => {
+    setShowUpload(false);
+    setFile(null);
+  };
+  const handleUpload = () => {
+    subjectInQuarterApi.upload(file);
+    handleCloseUpload();
+  };
+
   const columns = [
     {
       name: "subject",
@@ -231,9 +257,10 @@ const SubjectInQuarter = () => {
       options: {
         filter: true,
         sort: true,
-        customBodyRender: (value) => {
-          return `${value.lastName} ${value.middleName} ${value.firstName}`;
-        },
+        customBodyRender: (value) =>
+          value == null
+            ? ""
+            : `${value.lastName} ${value.middleName} ${value.firstName}`,
       },
     },
     {
@@ -291,6 +318,11 @@ const SubjectInQuarter = () => {
   const options = {
     filterType: "dropdown",
     selectableRows: "none",
+    textLabels: {
+      body: {
+        noMatch: isLoading ? "Không có dữ liệu" : "Đang tải dữ liệu...",
+      },
+    },
     onFilterChange: (changedColumn, filterList) => {
       console.log(changedColumn, filterList);
     },
@@ -321,11 +353,11 @@ const SubjectInQuarter = () => {
                       }}
                     >
                       <TableRow>
-                        <TableCell>Code</TableCell>
-                        <TableCell>Subject</TableCell>
-                        <TableCell>Lecturer</TableCell>
-                        <TableCell>N.o students</TableCell>
-                        <TableCell>Max size</TableCell>
+                        <TableCell>Mã môn</TableCell>
+                        <TableCell>Tên môn học</TableCell>
+                        <TableCell>Giảng viên</TableCell>
+                        <TableCell>Sỉ số</TableCell>
+                        <TableCell>Sỉ số tối đa</TableCell>
                         <TableCell></TableCell>
                       </TableRow>
                     </TableHead>
@@ -335,8 +367,8 @@ const SubjectInQuarter = () => {
                           <TableCell>{row.subject.code}</TableCell>
                           <TableCell>{row.subject.name}</TableCell>
                           <TableCell>
-                            {row.lecturer.lastName} {row.lecturer.middleName}{" "}
-                            {row.lecturer.firstName}
+                            {row.lecturer==null?"":`${row.lecturer.lastName} ${row.lecturer.middleName} ${row.lecturer.firstName}`}
+                            
                           </TableCell>
                           <TableCell>{row.numberOfStudents}</TableCell>
                           <TableCell>{row.maxStudents}</TableCell>
@@ -402,18 +434,20 @@ const SubjectInQuarter = () => {
                       }}
                     >
                       <TableRow>
-                        <TableCell>Code</TableCell>
-                        <TableCell>Subject</TableCell>
-                        <TableCell>Lecturer</TableCell>
-                        <TableCell>N.o students</TableCell>
-                        <TableCell>Max size</TableCell>
+                        <TableCell>Mã môn</TableCell>
+                        <TableCell>Tên môn học</TableCell>
+                        <TableCell>Giảng viên</TableCell>
+                        <TableCell>Sỉ số</TableCell>
+                        <TableCell>Sỉ số tối đa</TableCell>
                         <TableCell></TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody style={{ backgroundColor: "white" }}>
                       <TableRow>
                         <TableCell align="center" colSpan={6}>
-                          Sorry, no matching records found
+                          {{ isLoading }
+                            ? "Không có dữ liệu"
+                            : "Đang tải dữ liệu..."}
                         </TableCell>
                       </TableRow>
                     </TableBody>
@@ -479,6 +513,7 @@ const SubjectInQuarter = () => {
       });
       quarterApi.getAllQuarters().then((result3) => {
         setQuarters(result3);
+        setIsLoading(true);
       });
     });
   }, []);
@@ -887,6 +922,59 @@ const SubjectInQuarter = () => {
                       color="error"
                       startIcon={<Cancel />}
                       onClick={handleCloseUploadFile}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </Grid>
+              </Grid>
+            </Box>
+          </Fade>
+        </Modal>
+
+        {/* Import file of subjects */}
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          open={showUpload}
+          onClose={handleCloseUpload}
+          closeAfterTransition
+          slots={{ backdrop: Backdrop }}
+          slotProps={{
+            backdrop: {
+              timeout: 500,
+            },
+          }}
+        >
+          <Fade in={showUpload}>
+            <Box sx={style.boxStyle}>
+              <Typography style={style.textStyle}>
+                Import A List Of Subjects
+              </Typography>
+              <FormGroup>
+                <TextField
+                  type="file"
+                  onChange={(e) => setFile(e.target.files[0])}
+                ></TextField>
+              </FormGroup>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <div style={{ textAlign: "right" }}>
+                    <Button
+                      color="primary"
+                      startIcon={<Send />}
+                      onClick={handleUpload}
+                    >
+                      Submit
+                    </Button>
+                  </div>
+                </Grid>
+                <Grid item xs={6}>
+                  <div style={{ textAlign: "left" }}>
+                    <Button
+                      color="error"
+                      startIcon={<Cancel />}
+                      onClick={handleCloseUpload}
                     >
                       Cancel
                     </Button>

@@ -142,13 +142,22 @@ const Lecturer = () => {
   };
   const columns = [
     {
-      name: "lastName",
-      label: "Fullname",
+      name: "code",
+      label: "Mã số",
       options: {
         filter: false,
         sort: true,
-        customBodyRender: (dataIndex, rowIndex) => {
-          return `${data[rowIndex.rowIndex].lastName} ${data[rowIndex.rowIndex].middleName} ${data[rowIndex.rowIndex].firstName}`;
+      },
+    },
+    {
+      name: "lastName",
+      label: "Họ và tên",
+      options: {
+        filter: false,
+        sort: true,
+        customBodyRender: (value, meta) => {
+          const record = data[meta.currentTableData[meta.rowIndex].index];
+          return `${record.lastName} ${record.middleName} ${record.firstName}`;
         },
       },
     },
@@ -162,7 +171,7 @@ const Lecturer = () => {
     },
     {
       name: "organization",
-      label: "Department",
+      label: "Khoa",
       options: {
         filter: true,
         sort: true,
@@ -219,7 +228,6 @@ const Lecturer = () => {
     <>
       <div style={{ height: "100%", width: "100%" }}>
         <MUIDataTable
-          title={"Lecturer List"}
           data={data}
           columns={columns}
           options={options}

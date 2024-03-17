@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 // material-ui
 import { useTheme } from "@mui/material/styles";
 import {
+  Autocomplete,
   Button,
   Grid,
   Icon,
@@ -25,6 +26,7 @@ import MainCard from "ui-component/cards/MainCard";
 import { gridSpacing } from "store/constant";
 import { PieChart } from "@mui/x-charts";
 import { Download, Filter, FilterAlt } from "@mui/icons-material";
+import Department from "views/management/department";
 
 const status = [
   {
@@ -40,11 +42,17 @@ const status = [
     label: "This Year",
   },
 ];
-const GraduationStatistics = ({ isLoading, data, category }) => {
+const GraduationStatistics = ({
+  isLoading,
+  category,
+  generations,
+  departments,
+}) => {
   const [value, setValue] = useState("today");
   const theme = useTheme();
   const customization = useSelector((state) => state.customization);
-
+  const [generation, setGeneration] = useState(generations[0]);
+  const [department, setDepartment] = useState(departments[0]);
   const { navType } = customization;
   const { primary } = theme.palette.text;
   const darkLight = theme.palette.dark.light;
@@ -58,8 +66,6 @@ const GraduationStatistics = ({ isLoading, data, category }) => {
   const secondaryMain = theme.palette.secondary.main;
   const secondaryLight = theme.palette.secondary.light;
   const secondary200 = theme.palette.secondary[200];
-
-
 
   //   useEffect(() => {
   //     const newChartData = {
@@ -121,13 +127,37 @@ const GraduationStatistics = ({ isLoading, data, category }) => {
   //     isLoading,
   //     grey500,
   //   ]);
+  const [data, setData] = useState([]);
   useEffect(() => {
+    studentApi.getStatusByFilter("", "", "").then((res) => {
+      setData(res);
+    });
     // do not load chart when loading
     if (!isLoading) {
       ApexCharts.exec(`pie`, "updateOptions");
     }
   }, []);
+  const handleChange = (newValue) => {
+    studentApi
+      .getStatusByFilter(
+        newValue.id == null ? "" : newValue.id,
+        department.id == null ? "" : department.id
+      )
+      .then((res) => {
+        setData(res);
+      });
+  };
 
+  const handleChange1 = (newValue) => {
+    studentApi
+      .getStatusByFilter(
+        generation.id == null ? "" : generation.id,
+        newValue.id == null ? "" : newValue.id
+      )
+      .then((res) => {
+        setData(res);
+      });
+  };
   const options = {
     chart: {
       animations: {
@@ -143,7 +173,6 @@ const GraduationStatistics = ({ isLoading, data, category }) => {
           speed: 350,
         },
       },
-      type: "donut",
       toolbar: {
         show: true,
         tools: {
@@ -191,8 +220,7 @@ const GraduationStatistics = ({ isLoading, data, category }) => {
       show: true,
       fontSize: "14px",
       fontFamily: `'Roboto', sans-serif`,
-      position: "bottom",
-      offsetX: 20,
+      position: "right",
       labels: {
         colors: grey500,
         useSeriesColors: false,
@@ -239,14 +267,47 @@ const GraduationStatistics = ({ isLoading, data, category }) => {
                 <Grid item>
                   <Grid container direction="column" spacing={1}>
                     <Grid item>
-                      <Typography variant="h3">Graduation</Typography>
+                      <Typography variant="h3">Tình trạng sinh viên</Typography>
                     </Grid>
                   </Grid>
                 </Grid>
               </Grid>
             </Grid>
+            <Grid item xs={12} alignItems="right">
+              <Grid container spacing={gridSpacing}>
+                <Grid item xs={12} sm={6} alignItems="right">
+                  <Autocomplete
+                    value={generation}
+                    options={generations}
+                    onChange={(event, newValue) => {
+                      setGeneration(newValue);
+                      handleChange(newValue);
+                    }}
+                    getOptionLabel={(option) => option.name}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Khóa" />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} alignItems="right">
+                  <Autocomplete
+                    value={department}
+                    options={departments}
+                    onChange={(event, newValue) => {
+                      setDepartment(newValue);
+                      handleChange1(newValue);
+                    }}
+                    getOptionLabel={(option) => option.name}
+                    renderInput={(params) => (
+                      <TextField {...params} label="Khoa" />
+                    )}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+
             <Grid item xs={12} alignItems="center">
-              <Chart options={options} series={data} type="pie" />
+              <Chart options={options} series={data} type="donut" />
             </Grid>
           </Grid>
         </MainCard>

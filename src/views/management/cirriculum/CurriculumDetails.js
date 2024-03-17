@@ -95,6 +95,7 @@ const CurriculumDetails = () => {
     },
   };
   const cId = useParams();
+  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState([]);
   const [data3, setData3] = useState([]);
   const [value, setValue] = useState("1");
@@ -102,7 +103,7 @@ const CurriculumDetails = () => {
   const [subjects, setSubjects] = useState([]);
   const [generations, setGenerations] = useState([]);
   const [requirements, setRequirements] = useState([]);
-  const [enable,setEnable] = useState(false)
+  const [enable, setEnable] = useState(false);
   const [newCurriculum, setNewCurriculum] = useState({
     id: useParams().id,
     subjects: [],
@@ -149,7 +150,7 @@ const CurriculumDetails = () => {
   const columns = [
     {
       name: "code",
-      label: "Block code",
+      label: "Mã khối",
       options: {
         filter: true,
         sort: true,
@@ -157,7 +158,7 @@ const CurriculumDetails = () => {
     },
     {
       name: "name",
-      label: "Title",
+      label: "Khối",
       options: {
         filter: true,
         sort: true,
@@ -165,7 +166,7 @@ const CurriculumDetails = () => {
     },
     {
       name: "credit",
-      label: "Credit",
+      label: "Số tín chỉ",
       options: {
         filter: true,
         sort: true,
@@ -173,7 +174,7 @@ const CurriculumDetails = () => {
     },
     {
       name: "paraBlock",
-      label: "Directly under",
+      label: "Trực thuộc",
       options: {
         filter: true,
         sort: true,
@@ -288,7 +289,7 @@ const CurriculumDetails = () => {
         MuiTableBody: {
           styleOverrides: {
             root: {
-              backgroundColor: "#ede7f6",
+              backgroundColor: isLoading ? "#ede7f6" : "white",
             },
           },
         },
@@ -297,10 +298,9 @@ const CurriculumDetails = () => {
             paddingCheckbox: {
               display: "none",
             },
-            root:{
-              width:"max-content",
-              fontWeight:"550"
-            }
+            root: {
+              fontWeight: "550",
+            },
           },
         },
       },
@@ -340,12 +340,11 @@ const CurriculumDetails = () => {
           styleOverrides: {
             paddingCheckbox: {
               display: "none",
-              
             },
-            root:{
-              width:"max-content",
-              fontWeight:enable?"550":"400"
-            }
+            root: {
+              width: "max-content",
+              fontWeight: enable ? "550" : "400",
+            },
           },
         },
       },
@@ -354,10 +353,15 @@ const CurriculumDetails = () => {
     filter: true,
     selectableRows: "none",
     filterType: "dropdown",
+    textLabels: {
+      body: {
+        noMatch: isLoading ? "Không có dữ liệu" : "Đang tải dữ liệu...",
+      },
+    },
     onFilterChange: (changedColumn, filterList) => {
       console.log(changedColumn, filterList);
     },
-    customToolbar: () => <HeaderElements />,
+    // customToolbar: () => <HeaderElements />,
     rowsPerPage: 10,
     expandableRows: true,
     rowsExpanded: data1.map((el, i) => {
@@ -401,25 +405,87 @@ const CurriculumDetails = () => {
                   <td colSpan={6}>
                     <TableContainer>
                       <Table style={{ minWidth: "100%" }}>
-                        <TableHead style={{ display: "table-header-group"}}>
+                        <TableHead style={{ display: "table-header-group" }}>
                           <TableRow>
-                            <TableCell style={{fontWeight:"400" }}>Subject code</TableCell>
-                            <TableCell style={{fontWeight:"400" }}>Title</TableCell>
-                            <TableCell style={{fontWeight:"400" }}>Theory Credits</TableCell>
-                            <TableCell style={{fontWeight:"400" }}>Lab Credits</TableCell>
-                            <TableCell style={{fontWeight:"400" }}>Note</TableCell>
+                            <TableCell style={{ fontWeight: "400" }}>
+                              Mã môn
+                            </TableCell>
+                            <TableCell style={{ fontWeight: "400" }}>
+                              Tên môn học
+                            </TableCell>
+                            <TableCell style={{ fontWeight: "400" }}>
+                              TC lý thuyết
+                            </TableCell>
+                            <TableCell style={{ fontWeight: "400" }}>
+                              Tc thực hành
+                            </TableCell>
+                            <TableCell style={{ fontWeight: "400" }}>
+                              Phân loại
+                            </TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {rows.map((row) => (
                             <TableRow key={row.id}>
-                              <TableCell style={{fontWeight:"400" }}>{row.code}</TableCell>
-                              <TableCell style={{fontWeight:"400" }}>{row.subject.name}</TableCell>
-                              <TableCell style={{fontWeight:"400" }}>{row.subject.theoryCredit}</TableCell>
-                              <TableCell style={{fontWeight:"400" }}>{row.subject.labCredit}</TableCell>
-                              <TableCell style={{fontWeight:"400" }}>{row.mandatory}</TableCell>
+                              <TableCell style={{ fontWeight: "400" }}>
+                                {row.code}
+                              </TableCell>
+                              <TableCell style={{ fontWeight: "400" }}>
+                                {row.subject.name}
+                              </TableCell>
+                              <TableCell style={{ fontWeight: "400" }}>
+                                {row.subject.theoryCredit}
+                              </TableCell>
+                              <TableCell style={{ fontWeight: "400" }}>
+                                {row.subject.labCredit}
+                              </TableCell>
+                              <TableCell style={{ fontWeight: "400" }}>
+                                {row.mandatory}
+                              </TableCell>
                             </TableRow>
                           ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </td>
+                </tr>
+              </>
+            );
+          } else {
+            setEnable(true);
+            return (
+              <>
+                <tr>
+                  <td colSpan={6}>
+                    <TableContainer>
+                      <Table style={{ minWidth: "100%" }}>
+                        <TableHead style={{ display: "table-header-group" }}>
+                          <TableRow>
+                            <TableCell style={{ fontWeight: "400" }}>
+                              Mã môn
+                            </TableCell>
+                            <TableCell style={{ fontWeight: "400" }}>
+                              Tên môn học
+                            </TableCell>
+                            <TableCell style={{ fontWeight: "400" }}>
+                              TC lý thuyết
+                            </TableCell>
+                            <TableCell style={{ fontWeight: "400" }}>
+                              Tc thực hành
+                            </TableCell>
+                            <TableCell style={{ fontWeight: "400" }}>
+                              Phân loại
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell style={{ fontWeight: "400" }} align="center" colSpan={6}>
+                              {{ isLoading }
+                                ? "Không có dữ liệu"
+                                : "Đang tải dữ liệu..."}
+                            </TableCell>
+                          </TableRow>
                         </TableBody>
                       </Table>
                     </TableContainer>
@@ -551,7 +617,7 @@ const CurriculumDetails = () => {
   const columns3 = [
     {
       name: "code",
-      label: "Code",
+      label: "Mã",
       options: {
         filter: true,
         sort: true,
@@ -559,7 +625,7 @@ const CurriculumDetails = () => {
     },
     {
       name: "name",
-      label: "Condition",
+      label: "Điều kiện",
       options: {
         filter: true,
         sort: true,
@@ -570,17 +636,23 @@ const CurriculumDetails = () => {
     filter: true,
     selectableRows: "none",
     filterType: "dropdown",
+    textLabels: {
+      body: {
+        noMatch: isLoading?"Không có dữ liệu":"Đang tải dữ liệu...",
+      }
+    }
   };
   useEffect(() => {
-    blockApi.getBlocksByCurriculum(cId.id).then((res) => {
-      setData(res);
-      setNewCurriculum({ ...newCurriculum, subjects: res });
-      subjectInBlockApi.getSubjectsInCurriculum(cId.id).then((result) => {
-        setData3(result);
+    subjectInBlockApi.getSubjectsInCurriculum(cId.id).then((result) => {
+      setData3(result);
+      blockApi.getBlocksByCurriculum(cId.id).then((res) => {
+        setData(res);
+        setNewCurriculum({ ...newCurriculum, subjects: res });
       });
       curriculumApi.getCurriculumById(cId.id).then((res) => {
         setRequirements(res.conditions);
       });
+      setIsLoading(true);
     });
   }, []);
 
